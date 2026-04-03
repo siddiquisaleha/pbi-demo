@@ -8,7 +8,7 @@ const msalInstance = new msal.PublicClientApplication({
 
 async function login() {
   const res = await msalInstance.loginPopup({
-    scopes: ["https://analysis.windows.net/powerbi/api/.default"]
+    scopes: ["Report.Read.All"]
   });
   localStorage.setItem("account", JSON.stringify(res.account));
   window.location.href = "dashboard.html";
