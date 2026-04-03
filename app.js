@@ -29,8 +29,8 @@ async function loadReport() {
     type: "report",
     tokenType: 0,
     accessToken: token,
-    embedUrl: "https://app.powerbi.com/reportEmbed?reportId=a3f39ad9-1253-4a88-9492-58274cc36a96&autoAuth=true&ctid=3f490075-5020-4610-8ad9-2dd8534f2e41",
-    id: "a3f39ad9-1253-4a88-9492-58274cc36a96"
+    embedUrl: "https://app.powerbi.com/reportEmbed?reportId=986b8ac8-b62f-4af0-b5c5-701386a09c4d&autoAuth=true&ctid=3f490075-5020-4610-8ad9-2dd8534f2e41",
+    id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d"
   };
   powerbi.embed(document.getElementById("reportContainer"), config);
 }
@@ -41,10 +41,10 @@ async function loadChart() {
     type: "visual",
     tokenType: 0,
     accessToken: token,
-    embedUrl: "https://app.powerbi.com/reportEmbed?reportId=a3f39ad9-1253-4a88-9492-58274cc36a96&autoAuth=true&ctid=3f490075-5020-4610-8ad9-2dd8534f2e41",
-    id: "a3f39ad9-1253-4a88-9492-58274cc36a96",
-    pageName: "Sales Overview",
-    visualName: "Sales By Territory"
+    embedUrl: "https://app.powerbi.com/reportEmbed?reportId=986b8ac8-b62f-4af0-b5c5-701386a09c4d&autoAuth=true&ctid=3f490075-5020-4610-8ad9-2dd8534f2e41",
+    id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d",
+    pageName: "Executive Summary",
+    visualName: "CY Persistency % and PY Persistency %  by Branch "
   };
   powerbi.embed(document.getElementById("chartContainer"), config);
 }
