@@ -70,16 +70,11 @@ async function loadChart() {
     const models = window['powerbi-client'].models;
 
     const config = {
-      type: "visual", // 🎯 Change from "report" to "visual"
+      type: "report", // ✅ MUST be "report"
       tokenType: models.TokenType.Aad,
       accessToken: token,
       embedUrl: "https://app.powerbi.com/reportEmbed?reportId=986b8ac8-b62f-4af0-b5c5-701386a09c4d",
       id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d",
-      
-      // 🎯 You MUST specify the page and visual name here
-      pageName: "Executive Summary", // This is the internal ID (e.g., ReportSection123), not the Display Name
-      visualName: "sample", 
-      
       settings: {
         panes: {
           filters: { visible: false },
@@ -89,16 +84,44 @@ async function loadChart() {
     };
 
     const container = document.getElementById("chartContainer");
-    
-    // This will now render ONLY the chart "visualContainer3"
-    const visual = powerbi.embed(container, config);
+    const report = powerbi.embed(container, config);
+
+    report.on("loaded", async () => {
+      const pages = await report.getPages();
+
+      // ✅ IMPORTANT: use displayName correctly
+      const page = pages.find(p => p.displayName === "Executive Summary") || pages[0];
+      await page.setActive();
+
+      const visuals = await page.getVisuals();
+
+      console.log("ALL VISUALS:", visuals);
+
+      // 🎯 👉 CHANGE THIS after checking console
+      const targetVisualName = "visualContainer3";
+
+      // 🔥 Hide all except target
+      for (const v of visuals) {
+        if (v.name === targetVisualName) {
+          await v.setVisualDisplayState(
+            models.VisualContainerDisplayMode.Visible
+          );
+        } else {
+          await v.setVisualDisplayState(
+            models.VisualContainerDisplayMode.Hidden
+          );
+        }
+      }
+
+      // ✅ Extra safety (forces focus)
+      await report.focusedVisual.set(targetVisualName);
+
+    });
 
   } catch (err) {
     console.error("Chart load error:", err);
   }
-}
-
-// 🚀 Init
+}// 🚀 Init
 if (location.pathname.includes("chart")) {
   loadChart();
 }
