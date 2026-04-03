@@ -2,7 +2,7 @@ const msalInstance = new msal.PublicClientApplication({
   auth: {
     clientId: "e990a8c9-3d3f-4929-be3f-ed71e3a05435",
     authority: "https://login.microsoftonline.com/3f490075-5020-4610-8ad9-2dd8534f2e41",
-    redirectUri: window.location.origin
+    redirectUri: "https://siddiquisaleha.github.io/pbi-demo/"
   }
 });
 
