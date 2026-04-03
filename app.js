@@ -64,10 +64,16 @@ async function loadReport() {
 }
 
 // 📈 LOAD SPECIFIC VISUAL
+let visuals = [];
+let currentIndex = 0;
+let slideshowInterval;
+let isPlaying = true;
+let report, models;
+
 async function loadChart() {
   try {
     const token = await getToken();
-    const models = window['powerbi-client'].models;
+    models = window['powerbi-client'].models;
 
     const config = {
       type: "report",
@@ -76,7 +82,6 @@ async function loadChart() {
       embedUrl: "https://app.powerbi.com/reportEmbed?reportId=986b8ac8-b62f-4af0-b5c5-701386a09c4d",
       id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d",
       settings: {
-        background: models.BackgroundType.Transparent,
         panes: {
           filters: { visible: false },
           pageNavigation: { visible: false }
@@ -84,40 +89,107 @@ async function loadChart() {
       }
     };
 
-    const container = document.getElementById("chartContainer");
-    const report = powerbi.embed(container, config);
+    report = powerbi.embed(document.getElementById("chartContainer"), config);
 
     report.on("loaded", async () => {
       const pages = await report.getPages();
-
-      // 👉 Select correct page
       const page = pages.find(p => p.displayName === "Executive Summary") || pages[0];
       await page.setActive();
 
-      const visuals = await page.getVisuals();
+      visuals = await page.getVisuals();
 
-      // 🔍 Check once in console
-      console.log("ALL VISUALS:", visuals);
+      // Remove unwanted visuals
+      visuals = visuals.filter(v => v.type !== "slicer");
 
-      // 🔴 IMPORTANT: replace with your actual visual name after checking console
-      const targetVisual =
-        visuals.find(v => v.name === "sample") || visuals[0];
+      console.log("SLIDESHOW VISUALS:", visuals);
 
-      // 🔥 Hide all other visuals
-      for (const v of visuals) {
-        if (v.name !== targetVisual.name) {
-          await v.setVisualDisplayState(models.VisualContainerDisplayMode.Hidden);
-        }
-      }
-
-      // ✅ Ensure target visual is visible
-      await targetVisual.setVisualDisplayState(models.VisualContainerDisplayMode.Visible);
-
+      createDots();
+      showSlide(0);
+      startSlideshow();
     });
 
   } catch (err) {
-    console.error("Chart load error:", err);
+    console.error(err);
   }
+}
+
+// 🎯 Show specific visual
+async function showSlide(index) {
+  currentIndex = index;
+
+  for (const v of visuals) {
+    await v.setVisualDisplayState(models.VisualContainerDisplayMode.Hidden);
+  }
+
+  const visual = visuals[index];
+  await visual.setVisualDisplayState(models.VisualContainerDisplayMode.Visible);
+
+  // Update title
+  document.getElementById("visualTitle").innerText =
+    visual.title || `Visual ${index + 1}`;
+
+  updateDots();
+}
+
+// ▶️ Slideshow
+function startSlideshow() {
+  slideshowInterval = setInterval(() => {
+    nextSlide();
+  }, 4000);
+}
+
+function stopSlideshow() {
+  clearInterval(slideshowInterval);
+}
+
+// ⏯ Toggle
+function togglePlay() {
+  if (isPlaying) {
+    stopSlideshow();
+    document.getElementById("playBtn").innerText = "▶ Play";
+  } else {
+    startSlideshow();
+    document.getElementById("playBtn").innerText = "⏸ Pause";
+  }
+  isPlaying = !isPlaying;
+}
+
+// ⏭ Next
+function nextSlide() {
+  currentIndex = (currentIndex + 1) % visuals.length;
+  showSlide(currentIndex);
+}
+
+// ⏮ Prev
+function prevSlide() {
+  currentIndex = (currentIndex - 1 + visuals.length) % visuals.length;
+  showSlide(currentIndex);
+}
+
+// 🔵 Dots
+function createDots() {
+  const dotsContainer = document.getElementById("dots");
+  dotsContainer.innerHTML = "";
+
+  visuals.forEach((_, i) => {
+    const dot = document.createElement("span");
+    dot.classList.add("dot");
+    dot.onclick = () => showSlide(i);
+    dotsContainer.appendChild(dot);
+  });
+}
+
+function updateDots() {
+  const dots = document.querySelectorAll(".dot");
+  dots.forEach(d => d.classList.remove("active-dot"));
+  if (dots[currentIndex]) {
+    dots[currentIndex].classList.add("active-dot");
+  }
+}
+
+// 🚀 Init
+if (location.pathname.includes("chart")) {
+  loadChart();
 }
 // 🚀 ROUTING
 if (location.pathname.includes("dashboard")) {
