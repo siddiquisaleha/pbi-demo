@@ -70,11 +70,16 @@ async function loadChart() {
     const models = window['powerbi-client'].models;
 
     const config = {
-      type: "report",
+      type: "visual", // 🎯 Change from "report" to "visual"
       tokenType: models.TokenType.Aad,
       accessToken: token,
       embedUrl: "https://app.powerbi.com/reportEmbed?reportId=986b8ac8-b62f-4af0-b5c5-701386a09c4d",
       id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d",
+      
+      // 🎯 You MUST specify the page and visual name here
+      pageName: "Executive Summary", // This is the internal ID (e.g., ReportSection123), not the Display Name
+      visualName: "sample", 
+      
       settings: {
         panes: {
           filters: { visible: false },
@@ -84,40 +89,15 @@ async function loadChart() {
     };
 
     const container = document.getElementById("chartContainer");
-    const report = powerbi.embed(container, config);
-
-    report.on("loaded", async () => {
-      const pages = await report.getPages();
-
-      // 👉 Select correct page
-      const page = pages.find(p => p.displayName === "Executive Summary") || pages[0];
-      await page.setActive();
-
-      const visuals = await page.getVisuals();
-
-      console.log("ALL VISUALS:", visuals);
-
-      // 🎯 👉 CHANGE THIS to your visual name
-      const targetVisualName = "sample";
-
-      // 🔥 Hide all except target
-      for (const v of visuals) {
-        if (v.name === targetVisualName) {
-          await v.setVisualDisplayState(
-            models.VisualContainerDisplayMode.Visible
-          );
-        } else {
-          await v.setVisualDisplayState(
-            models.VisualContainerDisplayMode.Hidden
-          );
-        }
-      }
-    });
+    
+    // This will now render ONLY the chart "visualContainer3"
+    const visual = powerbi.embed(container, config);
 
   } catch (err) {
     console.error("Chart load error:", err);
   }
 }
+
 // 🚀 Init
 if (location.pathname.includes("chart")) {
   loadChart();
