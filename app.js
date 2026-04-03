@@ -64,16 +64,12 @@ async function loadReport() {
 }
 
 // 📈 LOAD SPECIFIC VISUAL
-let visuals = [];
-let currentIndex = 0;
-let slideshowInterval;
-let isPlaying = true;
-let report, models;
-
 async function loadChart() {
   try {
     const token = await getToken();
-    models = window['powerbi-client'].models;
+    const models = window['powerbi-client'].models;
+
+    const container = document.getElementById("chartContainer");
 
     const config = {
       type: "report",
@@ -82,6 +78,8 @@ async function loadChart() {
       embedUrl: "https://app.powerbi.com/reportEmbed?reportId=986b8ac8-b62f-4af0-b5c5-701386a09c4d",
       id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d",
       settings: {
+        layoutType: models.LayoutType.Custom,
+        background: models.BackgroundType.Transparent,
         panes: {
           filters: { visible: false },
           pageNavigation: { visible: false }
@@ -89,104 +87,50 @@ async function loadChart() {
       }
     };
 
-    report = powerbi.embed(document.getElementById("chartContainer"), config);
+    const report = powerbi.embed(container, config);
 
     report.on("loaded", async () => {
       const pages = await report.getPages();
       const page = pages.find(p => p.displayName === "Executive Summary") || pages[0];
       await page.setActive();
 
-      visuals = await page.getVisuals();
+      const visuals = await page.getVisuals();
+      console.log("VISUALS:", visuals);
 
-      // Remove unwanted visuals
-      visuals = visuals.filter(v => v.type !== "slicer");
+      // 👉 Replace with your actual visual name after checking console
+      const target = visuals.find(v => v.name === "visualContainer3") || visuals[0];
 
-      console.log("SLIDESHOW VISUALS:", visuals);
+      const layout = await page.getVisualLayout(target.name);
 
-      createDots();
-      showSlide(0);
-      startSlideshow();
+      // 🎯 Pixel perfect layout
+      await page.updateSettings({
+        layoutType: models.LayoutType.Custom,
+        customLayout: {
+          displayOption: models.DisplayOption.FitToPage,
+          pagesLayout: {
+            [page.name]: {
+              visualsLayout: {
+                [target.name]: {
+                  x: 50,
+                  y: 50,
+                  z: 10,
+                  width: layout.width,
+                  height: layout.height,
+                  displayState: {
+                    mode: models.VisualContainerDisplayMode.Visible
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
     });
 
   } catch (err) {
-    console.error(err);
+    console.error("Chart load error:", err);
   }
 }
-
-// 🎯 Show specific visual
-async function showSlide(index) {
-  currentIndex = index;
-
-  for (const v of visuals) {
-    await v.setVisualDisplayState(models.VisualContainerDisplayMode.Hidden);
-  }
-
-  const visual = visuals[index];
-  await visual.setVisualDisplayState(models.VisualContainerDisplayMode.Visible);
-
-  // Update title
-  document.getElementById("visualTitle").innerText =
-    visual.title || `Visual ${index + 1}`;
-
-  updateDots();
-}
-
-// ▶️ Slideshow
-function startSlideshow() {
-  slideshowInterval = setInterval(() => {
-    nextSlide();
-  }, 4000);
-}
-
-function stopSlideshow() {
-  clearInterval(slideshowInterval);
-}
-
-// ⏯ Toggle
-function togglePlay() {
-  if (isPlaying) {
-    stopSlideshow();
-    document.getElementById("playBtn").innerText = "▶ Play";
-  } else {
-    startSlideshow();
-    document.getElementById("playBtn").innerText = "⏸ Pause";
-  }
-  isPlaying = !isPlaying;
-}
-
-// ⏭ Next
-function nextSlide() {
-  currentIndex = (currentIndex + 1) % visuals.length;
-  showSlide(currentIndex);
-}
-
-// ⏮ Prev
-function prevSlide() {
-  currentIndex = (currentIndex - 1 + visuals.length) % visuals.length;
-  showSlide(currentIndex);
-}
-
-// 🔵 Dots
-function createDots() {
-  const dotsContainer = document.getElementById("dots");
-  dotsContainer.innerHTML = "";
-
-  visuals.forEach((_, i) => {
-    const dot = document.createElement("span");
-    dot.classList.add("dot");
-    dot.onclick = () => showSlide(i);
-    dotsContainer.appendChild(dot);
-  });
-}
-
-function updateDots() {
-  const dots = document.querySelectorAll(".dot");
-  dots.forEach(d => d.classList.remove("active-dot"));
-  if (dots[currentIndex]) {
-    dots[currentIndex].classList.add("active-dot");
-  }
-}
-
 // 🚀 Init
 if (location.pathname.includes("chart")) {
   loadChart();
