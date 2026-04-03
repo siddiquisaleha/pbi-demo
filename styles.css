@@ -47,3 +47,44 @@ body {
   padding: 10px;
   height: 650px;
 }
+#chartContainer {
+  height: 500px;
+  margin: 20px auto;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.controls {
+  margin-top: 20px;
+}
+
+.controls button {
+  padding: 10px 18px;
+  margin: 5px;
+  border: none;
+  background: #0078d4;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background: #005fa3;
+}
+
+#dots {
+  margin-top: 15px;
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+  margin: 5px;
+  display: inline-block;
+  background-color: #bbb;
+  border-radius: 50%;
+}
+
+.active-dot {
+  background-color: #0078d4;
+}
