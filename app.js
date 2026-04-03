@@ -101,7 +101,7 @@ async function loadChart() {
 
       // 🔴 IMPORTANT: replace with your actual visual name after checking console
       const targetVisual =
-        visuals.find(v => v.name === "CY Persistency % and PY Persistency % by Branch ") || visuals[0];
+        visuals.find(v => v.name === "sample") || visuals[0];
 
       // 🔥 Hide all other visuals
       for (const v of visuals) {
