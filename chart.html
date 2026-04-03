@@ -1,26 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Visual</title>
+  <title>Visual Slideshow</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/powerbi-client@2.19.0/dist/powerbi.min.js"></script>
-  <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
 </head>
 <body>
+
 <div class="navbar">
   <div class="logo">PBI Demo</div>
   <div class="nav-links">
     <a href="dashboard.html">Dashboard</a>
-    <a href="chart.html">Visual</a>
+    <a href="chart.html">Slideshow</a>
     <a href="embed.html">Embed</a>
   </div>
 </div>
 
 <div class="page">
-  <h2>Single Visual</h2>
-  <div id="chartContainer" class="card"></div>
+
+  <h2 id="visualTitle">Loading...</h2>
+
+  <div id="chartContainer"></div>
+
+  <!-- 🎮 Controls -->
+  <div class="controls">
+    <button onclick="prevSlide()">⏮ Prev</button>
+    <button onclick="togglePlay()" id="playBtn">⏸ Pause</button>
+    <button onclick="nextSlide()">Next ⏭</button>
+  </div>
+
+  <!-- 🔵 Dots -->
+  <div id="dots"></div>
+
 </div>
 
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/powerbi-client/dist/powerbi.min.js"></script>
 <script src="app.js"></script>
+
 </body>
 </html>
