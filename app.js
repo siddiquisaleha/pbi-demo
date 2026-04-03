@@ -69,8 +69,6 @@ async function loadChart() {
     const token = await getToken();
     const models = window['powerbi-client'].models;
 
-    const container = document.getElementById("chartContainer");
-
     const config = {
       type: "report",
       tokenType: models.TokenType.Aad,
@@ -78,8 +76,6 @@ async function loadChart() {
       embedUrl: "https://app.powerbi.com/reportEmbed?reportId=986b8ac8-b62f-4af0-b5c5-701386a09c4d",
       id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d",
       settings: {
-        layoutType: models.LayoutType.Custom,
-        background: models.BackgroundType.Transparent,
         panes: {
           filters: { visible: false },
           pageNavigation: { visible: false }
@@ -87,44 +83,35 @@ async function loadChart() {
       }
     };
 
+    const container = document.getElementById("chartContainer");
     const report = powerbi.embed(container, config);
 
     report.on("loaded", async () => {
       const pages = await report.getPages();
+
+      // 👉 Select correct page
       const page = pages.find(p => p.displayName === "Executive Summary") || pages[0];
       await page.setActive();
 
       const visuals = await page.getVisuals();
-      console.log("VISUALS:", visuals);
 
-      // 👉 Replace with your actual visual name after checking console
-      const target = visuals.find(v => v.name === "sample") || visuals[0];
+      console.log("ALL VISUALS:", visuals);
 
-      const layout = await page.getVisualLayout(target.name);
+      // 🎯 👉 CHANGE THIS to your visual name
+      const targetVisualName = "sample";
 
-      // 🎯 Pixel perfect layout
-      await page.updateSettings({
-        layoutType: models.LayoutType.Custom,
-        customLayout: {
-          displayOption: models.DisplayOption.FitToPage,
-          pagesLayout: {
-            [page.name]: {
-              visualsLayout: {
-                [target.name]: {
-                  x: 50,
-                  y: 50,
-                  z: 10,
-                  width: layout.width,
-                  height: layout.height,
-                  displayState: {
-                    mode: models.VisualContainerDisplayMode.Visible
-                  }
-                }
-              }
-            }
-          }
+      // 🔥 Hide all except target
+      for (const v of visuals) {
+        if (v.name === targetVisualName) {
+          await v.setVisualDisplayState(
+            models.VisualContainerDisplayMode.Visible
+          );
+        } else {
+          await v.setVisualDisplayState(
+            models.VisualContainerDisplayMode.Hidden
+          );
         }
-      });
+      }
     });
 
   } catch (err) {
