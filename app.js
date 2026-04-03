@@ -98,7 +98,7 @@ async function loadChart() {
       console.log("VISUALS:", visuals);
 
       // 👉 Replace with your actual visual name after checking console
-      const target = visuals.find(v => v.name === "visualContainer3") || visuals[0];
+      const target = visuals.find(v => v.name === "sample") || visuals[0];
 
       const layout = await page.getVisualLayout(target.name);
 
