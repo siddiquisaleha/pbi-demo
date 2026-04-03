@@ -74,29 +74,38 @@ async function loadChart() {
       tokenType: models.TokenType.Aad,
       accessToken: token,
       embedUrl: "https://app.powerbi.com/reportEmbed?reportId=986b8ac8-b62f-4af0-b5c5-701386a09c4d",
-      id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d"
+      id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d",
+      settings: {
+        background: models.BackgroundType.Transparent,
+        panes: {
+          filters: { visible: false },
+          pageNavigation: { visible: false }
+        }
+      }
     };
 
-    const report = powerbi.embed(document.getElementById("chartContainer"), config);
+    const container = document.getElementById("chartContainer");
+    const report = powerbi.embed(container, config);
 
     report.on("loaded", async () => {
       const pages = await report.getPages();
 
-      // 👉 Set correct page (by display name)
+      // 👉 Step 1: Select correct page
       const page = pages.find(p => p.displayName === "Executive Summary") || pages[0];
       await page.setActive();
 
+      // 👉 Step 2: Get visuals
       const visuals = await page.getVisuals();
 
-      // 🔍 DEBUG: See all visuals in console
+      // 🔍 DEBUG (run once, then remove)
       console.log("ALL VISUALS:", visuals);
 
-      // 👉 CHANGE THIS AFTER CHECKING CONSOLE
-      // Example:
-      // const visual = visuals.find(v => v.name === "visualContainer3");
+      // 👉 Step 3: Pick YOUR visual (UPDATE THIS)
+      const visual = visuals.find(v => 
+        v.title?.trim() === "CY Persistency % and PY Persistency %  by Branch"
+      ) || visuals[0];
 
-      const visual = visuals[0]; // temporary fallback
-
+      // 👉 Step 4: Focus only that visual
       if (visual) {
         await report.focusedVisual.set(visual.name);
       } else {
