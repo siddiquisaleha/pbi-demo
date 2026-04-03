@@ -90,34 +90,35 @@ async function loadChart() {
     report.on("loaded", async () => {
       const pages = await report.getPages();
 
-      // 👉 Step 1: Select correct page
+      // 👉 Select correct page
       const page = pages.find(p => p.displayName === "Executive Summary") || pages[0];
       await page.setActive();
 
-      // 👉 Step 2: Get visuals
       const visuals = await page.getVisuals();
 
-      // 🔍 DEBUG (run once, then remove)
+      // 🔍 Check once in console
       console.log("ALL VISUALS:", visuals);
 
-      // 👉 Step 3: Pick YOUR visual (UPDATE THIS)
-      const visual = visuals.find(v => 
-        v.title?.trim() === "CY Persistency % and PY Persistency %  by Branch"
-      ) || visuals[0];
+      // 🔴 IMPORTANT: replace with your actual visual name after checking console
+      const targetVisual =
+        visuals.find(v => v.name === "visualContainer3") || visuals[0];
 
-      // 👉 Step 4: Focus only that visual
-      if (visual) {
-        await report.focusedVisual.set(visual.name);
-      } else {
-        console.warn("Visual not found");
+      // 🔥 Hide all other visuals
+      for (const v of visuals) {
+        if (v.name !== targetVisual.name) {
+          await v.setVisualDisplayState(models.VisualContainerDisplayMode.Hidden);
+        }
       }
+
+      // ✅ Ensure target visual is visible
+      await targetVisual.setVisualDisplayState(models.VisualContainerDisplayMode.Visible);
+
     });
 
   } catch (err) {
     console.error("Chart load error:", err);
   }
 }
-
 // 🚀 ROUTING
 if (location.pathname.includes("dashboard")) {
   loadReport();
