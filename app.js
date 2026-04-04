@@ -98,7 +98,7 @@ async function loadChart() {
       console.log("ALL VISUALS:", visuals);
 
       // 🎯 👉 CHANGE THIS after checking console
-      const targetVisualName = "visualContainer3";
+      const targetVisualName = "sample";
 
       // 🔥 Hide all except target
       for (const v of visuals) {
