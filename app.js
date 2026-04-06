@@ -46,7 +46,7 @@ async function loadReport() {
       type: "report",
       tokenType: models.TokenType.Aad,
       accessToken: token,
-      embedUrl: "https://app.powerbi.com/view?r=eyJrIjoiYjUxODllNGMtY2MxNi00NWU0LTk1NGEtMzYzZTFiMTI1MDY5IiwidCI6IjNmNDkwMDc1LTUwMjAtNDYxMC04YWQ5LTJkZDg1MzRmMmU0MSJ9",
+      embedUrl: "https://app.powerbi.com/reportEmbed?reportId=a3f39ad9-1253-4a88-9492-58274cc36a96&autoAuth=true&ctid=3f490075-5020-4610-8ad9-2dd8534f2e41",
       id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d",
       settings: {
         panes: {
