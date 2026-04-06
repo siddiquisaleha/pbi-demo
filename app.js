@@ -63,65 +63,7 @@ async function loadReport() {
   }
 }
 
-// 📈 LOAD SPECIFIC VISUAL
-async function loadChart() {
-  try {
-    const token = await getToken();
-    const models = window['powerbi-client'].models;
 
-    const config = {
-      type: "report", // ✅ MUST be "report"
-      tokenType: models.TokenType.Aad,
-      accessToken: token,
-      embedUrl: "https://app.powerbi.com/reportEmbed?reportId=a3f39ad9-1253-4a88-9492-58274cc36a96&autoAuth=true&ctid=3f490075-5020-4610-8ad9-2dd8534f2e41",
-      id: "986b8ac8-b62f-4af0-b5c5-701386a09c4d",
-      settings: {
-        panes: {
-          filters: { visible: false },
-          pageNavigation: { visible: false }
-        }
-      }
-    };
-
-    const container = document.getElementById("chartContainer");
-    const report = powerbi.embed(container, config);
-
-    report.on("loaded", async () => {
-      const pages = await report.getPages();
-
-      // ✅ IMPORTANT: use displayName correctly
-      const page = pages.find(p => p.displayName === "Executive Summary") || pages[0];
-      await page.setActive();
-
-      const visuals = await page.getVisuals();
-
-      console.log("ALL VISUALS:", visuals);
-
-      // 🎯 👉 CHANGE THIS after checking console
-      const targetVisualName = "sample";
-
-      // 🔥 Hide all except target
-      for (const v of visuals) {
-        if (v.name === targetVisualName) {
-          await v.setVisualDisplayState(
-            models.VisualContainerDisplayMode.Visible
-          );
-        } else {
-          await v.setVisualDisplayState(
-            models.VisualContainerDisplayMode.Hidden
-          );
-        }
-      }
-
-      // ✅ Extra safety (forces focus)
-      await report.focusedVisual.set(targetVisualName);
-
-    });
-
-  } catch (err) {
-    console.error("Chart load error:", err);
-  }
-}// 🚀 Init
 if (location.pathname.includes("chart")) {
   loadChart();
 }
